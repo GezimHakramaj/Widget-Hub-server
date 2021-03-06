@@ -4,9 +4,7 @@ const axios = require("axios");
 
 router.get("/", async (req, res, next) => {
   try {
-    const result = await axios.get(
-      "https://api.covidtracking.com/v1/states/ny/current.json"
-    );
+    const result = await axios.get(`${process.env.COVID}`);
     const {
       positiveIncrease,
       totalTestResultsIncrease,

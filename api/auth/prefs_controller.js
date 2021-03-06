@@ -2,21 +2,22 @@ const express = require("express");
 const router = express.Router();
 const { Preference } = require("../../database/models");
 
-router.put("/:id", (req, res, next) => {
-  Preference.findByPk(1)
-    .then((pref) => {
-      pref.update({
+router.put("/edit", (req, res, next) => {
+  const { id } = req.session.user;
+  Preference.findByPk(id)
+    .then((prefs) => {
+      prefs.update({
         clock: req.body.clock,
         toDoList: req.body.toDoList,
         weather: req.body.weather,
         news: req.body.news,
         covid: req.body.covid,
       });
-      pref.save();
+      prefs.save();
+      req.session.user.pref = prefs;
       res.status(200).json({
         message: "Success",
-        pref,
-        data: req.session.user,
+        prefs,
       });
     })
     .catch((err) => {

@@ -35,15 +35,20 @@ router.post("/signup", (req, res, next) => {
     .then((user) => {
       models.Preference.create({
         userId: user.id,
-      }).catch((err) => {
-        res.status(401).json("Could not make preference.", err);
+      }).catch((err) =>
+        res.status(401).json("Could not make preference.", err)
+      );
+      return user;
+    })
+    .then((user) => {
+      models.Tasks.seedTasks(user.id);
+      return user;
+    })
+    .then((user) => {
+      res.status(200).json({
+        message: "Successfully created user.",
+        user,
       });
-      models.Tasks.create({
-        userId: user.id,
-      }).catch((err) => {
-        res.status(401).json("Could not make tasks.", err);
-      });
-      res.json(user);
     })
     .catch((err) => {
       err.name === "SequelizeUniqueConstraintError"
@@ -55,31 +60,6 @@ router.post("/signup", (req, res, next) => {
 router.delete("/logout", (req, res, next) => {
   req.session.user = null;
   res.send("Successfuly logged out.");
-});
-
-router.put("/edit", (req, res, next) => {
-  models.Preference.findByPk(1)
-    .then((prefs) => {
-      prefs.update({
-        clock: req.body.clock,
-        toDoList: req.body.toDoList,
-        weather: req.body.weather,
-        news: req.body.news,
-        covid: req.body.covid,
-      });
-      prefs.save();
-      req.session.user.pref = prefs;
-      res.status(200).json({
-        message: "Success",
-        prefs,
-      });
-    })
-    .catch((err) => {
-      res.status(500).json({
-        message: "Error",
-        err,
-      });
-    });
 });
 
 module.exports = router;

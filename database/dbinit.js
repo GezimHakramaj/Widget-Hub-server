@@ -16,6 +16,6 @@ const testDatabase = async () => {
 
 testDatabase();
 
-db.sync({ alter: true });
+db.sync({ force: true });
 
 module.exports = db;
