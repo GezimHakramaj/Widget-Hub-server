@@ -2,34 +2,18 @@ const express = require("express");
 const router = express.Router();
 const { Tasks } = require("../../database/models");
 
-router.get("/", (req, res, next) => {
-  Tasks.findAll({
-    where: {
-      userId: req.session.user,
-    },
-  })
-    .then((tasks) => res.json(tasks))
-    .catch((err) => res.json(err));
-});
-
-router.delete("/del", (req, res, next) => {
-  Tasks.destroy({
-    where: {
-      userId: req.session.user,
-    },
-  }).catch((err) => res.json({ message: "Err", err }));
-});
-
-router.post("/edit", (req, res, next) => {
-  req.body
-    .map((task) => {
-      Tasks.create({
-        title: task.title,
-        excerpt: task.excerpt,
-        userId: req.session.user,
-      }).catch((err) => res.json(err));
+router.put("/edit", (req, res, next) => {
+  Tasks.sequelize
+    .transaction(function (t) {
+      let promises = [];
+      req.body.map((task) => {
+        newPromise = Tasks.findByPk(task.id, { transaction: t });
+        promises.push(newPromise);
+      });
+      return Promise.all(promises);
     })
-    .then(() => res.json("Success"))
-    .catch((err) => res.json(err));
+    .then((tasks) => res.status(200).json({ message: "Success", tasks }))
+    .catch((err) => res.status(500).json(err.message));
 });
+
 module.exports = router;

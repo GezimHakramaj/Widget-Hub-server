@@ -1,5 +1,4 @@
 const router = require("express").Router();
-require("dotenv").config();
 
 router.use("/covid", require("./covid_controller"));
 router.use("/news", require("./news_controller"));
