@@ -1,9 +1,17 @@
 const { Sequelize } = require("sequelize");
 require("dotenv").config();
 
-const db = new Sequelize(
-  `postgres://${process.env.DB_USER}:${process.env.DB_PW}@localhost:5432/${process.env.DB_NAME}`
-);
+const db = new Sequelize(process.env.DATABASE_URL, {
+  //`postgres://${process.env.DB_USER}:${process.env.DB_PW}@localhost:5432/${process.env.DB_NAME}`
+  dialect: "postgres",
+  protocol: "postgres",
+  dialectOptions: {
+    ssl: {
+      sslmode: "require",
+      rejectUnauthorized: false,
+    },
+  },
+});
 
 const testDatabase = async () => {
   try {
